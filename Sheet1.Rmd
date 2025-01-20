@@ -1,0 +1,389 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+# R Markdown
+
+*Strg + Alt + I* um R Codeblock einzufügen
+
+```{md}
+'''{r, <name>, include=T, echo=T, eval= T, results="markup", fig.cap=""}
+'''
+```
+
+- \<name\> - name, for debugging
+- include - hides code and output in file
+- echo - hides code in file
+- eval - determines if code is ran
+- results - determines the output style
+    - markup - standard
+    - asis - plain text
+    - hidden - not shown
+- fig.cap - caption for figure in this block
+
+<div style="page-break-after: always;"></div>
+
+# Arbeitsblatt 1
+
+## Descriptive Statistics - Variables
+
+### Aufgabe1
+
+Are the following variables qualitative or quantitative? Which scales should be used for these variables?
+
+|     | Value               | Type         | Scale    | Range      |
+|-----|---------------------|--------------|----------|------------|
+| a   | Body Height         | quantitative | ratio    | continuous |
+| b   | Hair Color          | qualitative  | nominal  | discrete   |
+| c   | Temperature Celsius | qualitative  | interval | continuous |
+| d   | Temperature Kelvin  | quantitative | ratio    | continuous |
+| e   | Number of Bottles   | quantitative | absolute | discrete   |
+| f   | Birthday            | qualitative  | interval | discrete   |
+
+#### Type
+
+quantitative - measured in numbers, can be ordered in a logical or natural way, always discrete
+
+qualitative - denotes a certain category, cannot be ordered in a natural or logical way
+
+#### Scale
+
+nominal - belong to a category, cannot quantify or order, e.g. gender, colour
+
+ordinal - provide relative ordering to other items, e.g. school grades
+
+interval - can be ordered, no zero point, e.g. dates, degree celsius
+
+ratio - same as interval, has absolute zero, allows x to be 2-times y, e.g. amount of money, length, degree kelvin
+
+absolute - same as ratio, numbers are in natural units, e.g. number of bottles
+
+*absolute does not have to be measured*
+
+#### Range
+
+continuous - take any number in a certain range
+
+discrete - takes a finite number of values
+
+### Aufgabe 2
+
+It is possible to transform a variable ”downwards”, from a scale with more information contained, to a scale with less information contained. Give an example for the variable Price for a bottle of wine for the transformation from a ratio to an ordinal scale. Is it possible to transform a variable ”upwards”, from a scale with less information contained, to a scale with more information contained? Give an example (showing if it is possible or not)!
+
+-   Downscaling is possible, Price of bottles can be grouped in "under X€", "between X€ & Y€", "above Y€"
+
+-   Upscaling is impossible
+
+### Aufgabe 3
+
+Consider the question of describing students attitudes towards to legalisation of marijuana, as well as what proportion of them wants to legalize the drug and whether this proportion differs by gender and age.
+
+a)  Which data collection method is most suitable here: survey or experiment?
+
+    ```         
+    Survey
+    ```
+
+b)  How could you capture the attitudes towards legalisation in a single variable?
+
+    ```         
+    1 - 5 from very bad to very good
+    ```
+
+c)  Which variables are needed to answer the questions? Describe the type and the scale of the variables.
+
+    ```         
+    Attitude - qualitative, interval, discrete
+
+    Gender - qualitative, nominal, discrete
+
+    Age - quantitative, ratio, continuous
+    ```
+
+d)  How would an appropriate data set look? Try to describe the question in more details.
+
+<div style="page-break-after: always;"></div>
+
+## Introduction to R and RStudio
+
+### Aufgabe 1
+
+-   the sum of 52.3, 74.8, 3.17
+
+```{r}
+    sum(c(52.3, 74.8, 3.17))
+```
+
+-   the square root of 144
+
+```{r}
+    sqrt(144)
+```
+
+-   the 10-based logarithm of 200 multiplied with sin of π/4
+
+```{r}
+    log10(200 * sin(pi / 4))
+```
+
+-   the cumulative sum of the numbers 1,3,18,20,2
+
+```{r}
+    cumsum(c(1, 3, 18, 20, 2))
+```
+
+-   find 10 numbers between 0 and 20 rounded to the nearest integer value
+
+```{r results="hide"}
+    sample(c(0, 20), 10, replace = TRUE)
+    round(runif(10, 0, 20))
+```
+
+### Aufgabe 2
+
+-   Assign the number 5 to x and the number 10 to y.
+
+```{r}
+    x <- 5
+    y <- 10
+```
+
+-   Calculate the product of x and y.
+
+```{r}
+    x * y
+```
+
+-   Store the result in a new variable z.
+
+```{r}
+    z <- x * y
+```
+
+-   Make a vector myvec of the objects x,y,z.
+
+```{r}
+    myvec <- c(x, y, z)
+```
+
+-   Find the minimum, the maximum and the mean of the vector.
+
+```{r}
+    min(myvec)
+    max(myvec)
+    mean(myvec)
+```
+
+-   Remove myvec from the workspace.
+
+```{r}
+    remove(myvec)
+```
+
+### Aufgabe 3
+
+The numbers below are the first ten days of rainfall in a year 0.1 0.5 2.3 1.1 11.3 14.7 23.4 15.7 0 0.9
+
+-   Read them into a vector using the c() command
+
+```{r}
+    rainfall_per_year <- c(0.1, 0.5, 2.3, 1.1, 11.3, 14.7, 23.4, 15.7, 0, 0.9)
+```
+
+-   Calulate the mean and the standard deviation.
+
+```{r}
+    mean(rainfall_per_year)
+    sd(rainfall_per_year)
+```
+
+-   Calculate the cumulative rainfall over these ten days. What is total sum of the rainfall?
+
+```{r}
+    cumsum(rainfall_per_year)
+    sum(rainfall_per_year)
+```
+
+-   Which day saw the highest rainfall?
+
+```{r}
+    which.max(rainfall_per_year)
+```
+
+-   Take a subset of the rainfall data where rain is larger than 10.
+
+```{r}
+    rainfall_per_year[rainfall_per_year > 10]
+```
+
+-   What is mean rainfall for days where the rainfall was at least 5?
+
+```{r}
+    mean(rainfall_per_year[rainfall_per_year > 5])
+```
+
+-   Subset the vector where it is either exactly 0 or 1.1 and find the corresponding days.
+
+```{r}
+    rainfall_per_year[rainfall_per_year == 1.1 | rainfall_per_year == 0]
+    rainfall_per_year[rainfall_per_year %in% c(0, 1.1)]
+    which(rainfall_per_year == 1.1 | rainfall_per_year == 0)
+    which(rainfall_per_year %in% c(0, 1.1))
+```
+
+### Aufgabe 4
+
+The length of five cylinders are 2.5, 3.4, 4.8, 3.1, 1.7 and their diameters are 0.7, 0.4, 0.5, 0.5, 0.9.
+
+-   Read these vectors into two vectors with appropriate names.
+
+```{r}
+    length_of_cylinder <- c(2.5, 3.4, 4.8, 3.1, 1.7)
+    height_of_cylinder <- c(0.7, 0.4, 0.5, 0.5, 0.9)
+```
+
+-   Calculate the volumes of each cylinder and store it in a new vector
+
+```{r}
+    volume_of_cylinder <- length_of_cylinder * height_of_cylinder
+```
+
+```{r echo=F}
+    volume_of_cylinder
+```
+
+-   Assume the values are given in centimeter. Recalculate the volumes so that their units are cubic millimeter.
+
+```{r}
+    volume_of_cylinder_millimeter <- volume_of_cylinder * 1000
+```
+
+```{r, echo=FALSE}
+    volume_of_cylinder_millimeter
+```
+
+### Aufgabe 5
+
+```{r}
+    x <- c(1,2,3,4,5)
+    y <- c(3,5,7,9)
+```
+
+-   Find values that are contained in both x and y.
+
+```{r}
+    intersect(x, y)
+```
+
+-   Find values that are in x but not y and vice versa.
+
+```{r}
+    setdiff(x, y)
+```
+
+-   Construct a vector that contains all values contained in either x or y. Compare the result with c(x,y).
+
+```{r}
+    union(x, y)
+    c(x, y)
+```
+
+### Aufgabe 6
+
+Construct a matrix with 8 rows and 10 columns. The first row should contain the numbers 0, 2, 4, ..., 18 and the other rows should random integer numbers between 0 and 10.
+
+```{r}
+    matrix_w_random <- matrix(c(seq(0,18, by = 2), sample(0:10, 70,replace = T)),nrow = 8, ncol = 10, byrow = T)
+```
+
+-   Calculate the row means of this matrix and the standard deviation across the row means.
+
+```{r}
+    row_means <- rowMeans(matrix_w_random)
+    sd(row_means)
+```
+
+-   Store the rows 2,3,..,8 in a other matrix and calculate the column means. Use the command hist() to create a histogram of the column means.
+
+```{r}
+    matrix_w_random.2 <- matrix_w_random[2:8,] #Keep 2 - 8
+    matrix_w_random.2 <- matrix_w_random[-1,]  #Delete 1
+    col_means <- colMeans(matrix_w_random.2)
+    hist(col_means)
+```
+
+### Aufgabe 7
+
+-   Inspect the dataset mpg.
+
+```{r eval=F}
+    ?mpg
+```
+
+-   Determine the types and the scales of measurement of all variables in the dataset mpg. Further more determine whether the variables are discrete or continuous.
+
+| Value        | Type         | Scale    | Range      |
+|--------------|--------------|----------|------------|
+| Manufacturer | qualitative  | nominal  | discrete   |
+| Model        | qualitative  | nominal  | discrete   |
+| Displ        | quantitative | ratio    | continuous |
+| Year         | quantitative | interval | discrete   |
+| Cyl          | quantitative | absolute | discrete   |
+| Trans        | qualitative  | nominal  | discrete   |
+| Drv          | qualitative  | nominal  | discrete   |
+| Cty          | quantitative | ratio    | discrete   |
+| Hwy          | quantitative | ratio    | discrete   |
+| Fl           | qualitative  | nominal  | discrete   |
+| Class        | qualitative  | nominal  | discrete   |
+
+### Aufgabe 8
+
+-   Create a list containing the string “John”, the string “Mary” and the vector (4,6,10). The list describes a family with names of father, mother and the ages of the children.
+
+```{r}
+    family <- list(father = "John", mother = "Mary", child.ages = c(4, 6, 10))
+```
+
+```{r echo=F}
+    family
+```
+
+-   Create a second list containing the names Bob, Cate and Susan of the children.
+
+```{r}
+    child.names <- c("Bob", "Cate", "Susan")
+```
+
+```{r echo=F}
+    child.names
+```
+
+-   Concatenate the lists. Use the c() and the list() function. What are the differences?
+
+```{r}
+    c(family, child.names)
+    conc.list <- list(family, child.names = child.names)
+```
+
+```{r echo=F}
+    conc.list
+```
+
+-   Access the concatenated list to create directly a list containing for every child name and age.
+
+```{r}
+    conc.family <- list(child1= c(conc.list[[2]][[1]], conc.list[[1]][[3]][[1]]),
+                        child2= c(conc.list[[2]][[2]], conc.list[[1]][[3]][[2]]),
+                        child3= c(conc.list[[2]][[3]], conc.list[[1]][[3]][[3]]))
+```
+
+```{r echo=F}
+    conc.family
+```
