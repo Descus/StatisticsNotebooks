@@ -205,7 +205,7 @@ exercise.results %>% rowwise %>% mutate(sum.scores = sum(ex1:ex5), mean.scores =
 
 ### Aufgabe 5
 ```{r include=F}
-    library(nycflight13)
+    library(nycflights13)
 ```
 
 - Find all flights with more than 2 hours arrival delay.
@@ -214,5 +214,163 @@ exercise.results %>% rowwise %>% mutate(sum.scores = sum(ex1:ex5), mean.scores =
     nycflights13::flights %>% filter(arr_delay > 120)
 ```
 
+- Find all flights with more than 2 hours arrival delay and no departure delay.
+
+```{r}
+    nycflights13::flights %>% filter(arr_delay > 120 & dep_delay <= 0)
+```
+
+- Find all flights from United, American and Delta with no arrival delay.
+
+```{r}
+    nycflights13::flights %>% filter(carrier %in% c('UA', 'AA', 'DL')) %>% filter(arr_delay <= 0)
+```
+
+- Find all flights from United, American and Delta in the month
+May with more than 5 hours arrival delay sorted by carrier and
+flight number.
+
+```{r}
+    nycflights13::flights %>% filter(carrier %in% c('UA', 'AA', 'DL')) %>% filter(arr_delay >= 5) %>% filter(month == 5) %>% arrange(carrier, flight)
+```
 
 
+- Exchange the values of departure time and arrival time in minute
+after midnight.
+
+```{r}
+    conv_minutes <- \(x) {(x%%100) + (x%/%100) * 60}
+
+    nycflights13::flights %>% mutate(arr_time = conv_minutes(arr_time),
+                                     dep_time = conv_minutes(dep_time))
+```
+
+
+- Add a column speed which denotes the average speed of the flight
+and determine the carrier, flight of the top 10 values of speed.
+
+```{r}
+    nycflights13::flights %>% mutate(speed = round(distance / (air_time / 60))) %>% arrange(desc(speed)) %>% select(carrier, flight, speed) %>% slice(0:10)
+```
+
+- Find a list of carriers with a column ratio which denotes the number of flights with arr delay less than 10 minutes to the total
+number of flights. The list should be sorted by ratio.
+
+```{r}
+    nycflights13::flights %>% 
+    filter(!is.na(arr_delay)) %>% 
+    group_by(carrier) %>% 
+    summarise(nof = n(), 
+              ndel = sum(arr_delay < 10), 
+              del_ratio = round(ndel/nof, 3)) %>% 
+    arrange(desc(del_ratio)) 
+```
+
+
+- Find a list which denotes for every month the carrier with highest
+ratio which denotes the number of flights with arr delay less than
+10 minutes to the total number of flights. The list should have
+the columns month, carrier, number of flights of the carrier in that
+month and ratio.
+
+```{r}
+    nycflights13::flights %>%
+    filter(!is.na(arr_delay)) %>% 
+    group_by(carrier, month) %>% 
+    summarize(nof = n(), 
+              ndel = sum(arr_delay < 10), 
+              del_ratio=round(ndel/nof, 3)) %>% 
+    arrange(desc(del_ratio)) %>% 
+    group_by(month) %>% 
+    slice(which.max(del_ratio))
+```
+
+- Find a table with the number of cancelled flights (dep delay =
+NA), the number of flights with no dep delay ( —dep delay—
+≤ ± 5 minutes and the means of dep delay, arr delay per month
+and day.
+
+```{r}
+    canceled_flights <- nycflights13::flights %>% 
+    group_by(month, day) %>% 
+    summarise(nof_canc = sum(is.na(dep_delay)), .groups = "keep")
+
+    punctual_flights <- nycflights13::flights %>% 
+    group_by(month, day) %>% 
+    summarise(nof_canc = sum(is.na(dep_delay)), .groups = "keep")
+
+    mean_delays <- nycflights13::flights %>%
+    filter(!is.na(dep_delay) & !is.na(arr_delay)) %>% 
+    group_by(month, day) %>% 
+    summarise(mean_dep_delay = mean(dep_delay), mean_arr_delay = mean(arr_delay), .groups = "keep")
+    
+    merge(canceled_flights, punctual_flights) %>% 
+    merge(mean_delays) %>%
+    arrange(month, day)
+```
+
+- Determine a table that shows, for each airline (carrier), the flight
+connection given by the airports of dest und origin that occurred
+most frequently in 2013. The table should contain only the columns
+names of airline, destination, origin and frequency and be sorted
+by frequency in descending order. You can find the names of the
+carrier from the data set airlines and the names of the airports
+from the data set airports.
+
+```{r}
+    nycflights13::flights %>% 
+    group_by(carrier, origin, dest) %>% 
+    summarise(n = n(), .groups = "drop") %>% 
+    group_by(carrier) %>%
+    filter(n == max(n)) %>% 
+    ungroup() %>% 
+    left_join(nycflights13::airlines, by= "carrier") %>% 
+    rename(Airline = name) %>% 
+    left_join(nycflights13::airports, by= c("origin"="faa")) %>% 
+    rename(Airport.Origin = name) %>% 
+    left_join(nycflights13::airports, by= c("dest"="faa")) %>% 
+    rename(Airport.Destination = name) %>% 
+    select(n, Airline, Airport.Origin, Airport.Destination) %>% 
+    arrange(desc(n))
+```
+
+### Aufgabe 6
+
+- Consider the dataset who of the package tidyr.
+country, iso2, iso3, and year are already variables, so they can
+be left as is. But the columns from new sp m014 to newrel f65
+encode four variables in their names:
+    - The new /new prefix indicates these are counts of new cases. This dataset only contains new cases, so we’ll ignore it here because it’s constant.
+    - sp/rel/ep describe how the case was diagnosed.
+    - m/f gives the gender.
+    - 014/1524/2535/3544/4554/65 supplies the age range.
+Break these variables up by specifying multiple column names and
+make the data set tidy.
+
+- The anscombe dataset contains four pairs of variables (x1 and y1,
+x2 and y2, etc.) that underlie Anscombe’s quartet, a collection of
+four datasets that have the same summary statistics (mean, sd,
+correlation etc), but have quite different data.
+Produce a dataset with columns set, x and y.
+
+- Apply the following R statements
+
+```{r, label='setup'}
+    production <- expand_grid(
+        product = c("A", "B"),
+        country = c("AI", "EI"),
+        year = 2000:2014) %>%
+    filter((product == "A" & country == "AI") | product == "B") %>%
+    mutate(production = rnorm(nrow(.)))
+```
+
+The data set production contains the combination of product,
+country, and year.
+Widen the data so we have one column for each combination of
+product and country.
+
+- The data set warpbreaks gives the number of warp breaks per
+loom, where a loom corresponds to a fixed length of yarn for every
+combination of wool (A and B) and tension (L, M, H).
+Produce a data set with the columns tension, A, B with the means
+of the breaks.
