@@ -336,6 +336,10 @@ from the data set airports.
 
 ### Aufgabe 6
 
+```{r include=F}
+    library(tidyr)
+```
+
 - Consider the dataset who of the package tidyr.
 country, iso2, iso3, and year are already variables, so they can
 be left as is. But the columns from new sp m014 to newrel f65
@@ -347,15 +351,32 @@ encode four variables in their names:
 Break these variables up by specifying multiple column names and
 make the data set tidy.
 
+```{r}
+     tidyr::who %>% pivot_longer(cols = new_sp_m014:newrel_f65, 
+                                   names_to = c("type", "sex", "age"),
+                                   names_pattern = "new_?(.*)_(.)(.*)",
+                                   values_to = "cases", values_drop_na = T)
+```
+
 - The anscombe dataset contains four pairs of variables (x1 and y1,
 x2 and y2, etc.) that underlie Anscombe’s quartet, a collection of
 four datasets that have the same summary statistics (mean, sd,
 correlation etc), but have quite different data.
 Produce a dataset with columns set, x and y.
 
-- Apply the following R statements
+```{r}
+    anscombe %>% pivot_longer(
+        cols=everything(),
+        cols_vary = "slowest",
+        names_to = c(".value", "set"),
+        names_pattern = "(.)(.)"
+    )
+```
 
-```{r, label='setup'}
+
+- Apply the following R statements. The data set production contains the combination of product,country, and year. Widen the data so we have one column for each combination of product and country.
+
+```{r, label='production'}
     production <- expand_grid(
         product = c("A", "B"),
         country = c("AI", "EI"),
@@ -364,13 +385,19 @@ Produce a dataset with columns set, x and y.
     mutate(production = rnorm(nrow(.)))
 ```
 
-The data set production contains the combination of product,
-country, and year.
-Widen the data so we have one column for each combination of
-product and country.
+```{r}
+    production %>% pivot_wider(values_from = production, names_from = c(product, country))
+```
 
 - The data set warpbreaks gives the number of warp breaks per
 loom, where a loom corresponds to a fixed length of yarn for every
 combination of wool (A and B) and tension (L, M, H).
 Produce a data set with the columns tension, A, B with the means
 of the breaks.
+
+```{r}
+    warpbreaks %>% pivot_wider(names_from = wool,
+                               values_from = breaks,
+                               values_fn = mean)
+```
+

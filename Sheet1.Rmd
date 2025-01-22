@@ -14,11 +14,11 @@ library(ggplot2)
 *Strg + Alt + I* um R Codeblock einzufügen
 
 ```{md}
-'''{r, <name>, include=T, echo=T, eval= T, results="markup", fig.cap=""}
+'''{r, label="", include=T, echo=T, eval= T, results="markup", fig.cap=""}
 '''
 ```
 
-- \<name\> - name, for debugging
+- label - name, for debugging
 - include - hides code and output in file
 - echo - hides code in file
 - eval - determines if code is ran
