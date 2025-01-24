@@ -1,0 +1,199 @@
+---
+title: "Cheatsheet"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r include=F}
+    knitr::opts_chunk$set(eval=FALSE)
+```
+
+
+# R Markdown
+
+*Strg + Alt + I* um R Codeblock einzufügen
+
+```{md}
+'''{r, label="", include=T, echo=T, eval= T, results="markup", fig.cap=""}
+'''
+```
+
+- label - name, for debugging
+- include - hides code and output in file
+- echo - hides code in file
+- eval - determines if code is ran
+- results - determines the output style
+    - markup - standard
+    - asis - plain text
+    - hidden - not shown
+- fig.cap - caption for figure in this block
+
+# Descriptive
+
+## Input from file
+
+- Read data from csv
+```{r}
+    read.csv() #for Comma separated values
+    read.csv2() #for Semicolon separated values
+```
+
+## Import Libraries
+
+```{r}
+    library()
+```
+
+## Create Table
+
+```{r}
+    t <- tibble(col1 = 1:29, ...)
+```
+
+## Create Vector
+```{r}
+    vec <- c(v1, v2, ...)
+```
+
+## Replicate Values
+```{r}
+    rep(c("A", "B"), each=2) # AABB
+    rep(c("A", "B"), 2)      # ABAB
+    rep(1, 5)                # 1 1 1 1 1
+```
+
+## Sequencing Values
+```{r}
+    seq(from = 1, to = 5, by = 0.5) #
+    1:5
+```
+## Random Values
+
+```{r}
+    round(runif(10, 20, 35)) #10 Random floats between 20 and 35 rounded to int
+    sample(x = 1:10, size = 5, replace=T) #5 values sampled from a range from 1 to 10, multiples allowed 
+```
+
+## Edit Table Columns
+```{r}
+    mutate(col1 = 4)
+    rowwise() %>% mutate(col1 = sum(col2, col3)) # sum of col2 & col3 per row
+```
+
+## Add Row to Table
+```{r}
+    add_row(col1 = 34)
+```
+
+## Switch Case
+```{r}
+    case_when(col1 > 3 ~ "Greater 3", ...)
+```
+
+## if else
+```{r}
+    if_else(col1 >= 5, "Greater Equal 5", "Smaller 5")
+```
+
+## Filter data
+```{r}
+    filter(col1 > 6)
+```
+
+### Value is NA
+```{r}
+    is.na(col1) # true if value is NA
+```
+
+### Value in Vector
+```{r}
+    col1 %in% c("A", "B")
+```
+
+## Viewing specific Columns
+```{r}
+    select(col1, col2)
+```
+
+## Sorting
+```{r}
+    arrange(col1)
+```
+
+## Grouping data
+```{r}
+    group_by(col1)
+```
+
+## Summarise
+```{r}
+    summarise(col1 = mean(col2))
+```
+
+## Counting Data
+```{r}
+    summarise(col1 = n()) # counts items in group
+    count(group1) 
+```
+
+
+## Split Column into multiple
+```{r}
+    separate(col1, into=c("new_col2", "new_col3"), sep="/")
+```
+
+## Combine multiple Columns to one
+
+```{r}
+    unite(col1, old_col2, old_col3, sep="/")
+```
+
+## Expanding Tables 
+```{r}
+    pivot_wider(names_from=col1, values_from = col2)
+```
+    
+names_from: column name where the new column names should be drawn from
+values_from: column name where values should be drawn from
+
+```{r}
+    pivot_longer(cols = col1:col3, names_to = new_col4, names_pattern = "(.)(.)", values_to = new_col5)
+```
+    
+cols: vector of colums where values are drawn from
+names_to: vector of new column names for naming colums
+names_pattern: regex how to split the column names from <cols>
+values_to: column name for value column
+
+## contengency/indifference tables, chi-sqared test
+```{r}
+    test_result <- chisq.test(<colums_separated_by_comma>)
+    test_result$observed # contengency table, use addmargin for margins
+    test_result$expected # indifference table, use addmargin for margins 
+    test_result$statistic # chi-squared value
+```
+
+## Linear Regression 
+$y = a + b * x$
+```{r}
+    lin_reg <- lm(col2 ~ col1)
+    a <- lin_reg$coefficients[1] # intercept
+    b <- lin_reg$coefficients[2] # slope of regression line
+```
+
+## Covariance
+```{r}
+    cov(x, y)
+```
+
+## Corelation Coefficient
+```{r}
+    cor(x ,y)
+```
+
+## Determination Coefficient
+```{r}
+    cor(x, y) ^ 2
+```
+

@@ -1,0 +1,87 @@
+---
+title: "Exam 22"
+author: "Niklas Schmiedel"
+output:
+  html_document:
+    df_print: paged
+  word_document: default
+  pdf_document: default
+---
+
+```{r include=F}
+    library(tidyverse)
+```
+
+
+# Aufgabe 1
+
+a)
+```{r}
+    exam.data = read.csv("exam_data.csv")
+```
+
+c)
+```{r}
+    exam.data <- exam.data %>% mutate(grade = case_when(score < 50 ~ 5,
+                                                        score >= 50 & score < 65 ~ 4,
+                                                        score >= 65 & score < 80 ~ 3,
+                                                        score >= 80 & score < 90 ~ 2,
+                                                        score >= 90 ~ 1))
+```
+
+d)
+```{r}
+    exam.data <- exam.data %>% separate(exam, into=c("matnr", "subject"),sep = "/")
+```
+
+e)
+Number of Students
+```{r}
+    exam.data %>% select(matnr) %>% unique() %>% count()
+```
+Number of Tests
+```{r}
+    exam.data %>% group_by(subject) %>% summarise(num_test = n())
+```
+
+f)
+```{r}
+    exam.data %>% count(subject, grade) %>% pivot_wider(names_from = subject, values_from = n)
+```
+g)
+```{r}
+    exam.data %>% group_by(subject) %>% summarise(min = min(score), max = max(score), quant1= quantile(score, p=0.25), quant2 = quantile(score, p=0.5), quant3= quantile(score, p= 0.75), mean = mean(score), participants= n(), dropoutrate= sum(grade==5) / n())
+```
+
+h)
+```{r}
+    boxplot(exam.data$score ~ exam.data$subject,beside=T)
+```
+
+No significant Changes per Subject
+
+
+i)
+
+```{r message=FALSE, warning=FALSE}
+    test_result <- chisq.test(exam.data$attempt, exam.data$grade)
+```
+
+
+```{r}
+     test_result$observed %>% addmargins()
+```
+```{r}
+    test_result$expected %>% addmargins()
+```
+```{r}
+    test_result$statistic
+```
+
+# Aufgabe 2
+
+a)
+```{r}
+    coins <- tibble(no = 1:5, prob.head = dbinom(no, 5, 0.4), prob.tail = dbinom(no, 5, 1/6), prob.total = 1/3 * prob.head + 2/3 * prob.tail)
+```
+
