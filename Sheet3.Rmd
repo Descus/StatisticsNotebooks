@@ -1,18 +1,107 @@
 ---
-title: "R Notebook"
-output: html_notebook
+output:
+  html_document: default
+  pdf_document: default
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
-```{r}
-plot(cars)
+```{r include=F}
+    library(tidyverse)
+    library(ggplot2)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+# Arbeitsblatt 3
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+## Frequency Tables and Distributions
+
+### Aufgabe 1
+
+-   Consider the results of the national elections in Germany in 2013 and 2017:
+
+    | Party     | Results 2013 | Results 2017 |
+    |-----------|--------------|--------------|
+    | CDU       | 26.8         | 34.1         |
+    | SPD       | 20.5         | 25.7         |
+    | AfD       | 12.6         | 4.7          |
+    | FDP       | 10.7         | 4.8          |
+    | DIE LINKE | 9.2          | 8.6          |
+    | GRUENE    | 8.9          | 8.4          |
+    | CSU       | 6.2          | 7.4          |
+    | OTHER     | 5.0          | 6.2          |
+
+    Summarize the results of 2017 in a pie and a bar chart. Compare the results in 2013 and 2017 with an appropriate bar chart.
+
+```{r}
+    Results <- tibble(Party=c("CDU", "SPD", "AfD", "FDP", "DIE LINKE",             "GRUENE", "CSU", "Others"), 
+                  '2013'=c(26.8, 20.5, 12.6, 10.7, 9.2, 8.9, 6.2, 5.0), 
+                  '2017'=c(34.1, 25.7, 4.7, 4.8, 8.6, 8.4, 7.4, 6.2))
+```
+```{r}
+    Results <- Results %>% mutate(diff = Results$'2013' - Results$'2017')
+    Results$'2017' %>% pie(labels=Results$Party)
+
+    Results$'2017' %>% barplot(names.arg = Results$Party, ylab = "Voter Percent", ylim = c(0,40))
+
+    Results$diff %>% barplot(names.arg=Results$Party,
+                ylim=c(-10, 10),
+                xlab="Parties", ylab="Difference to 2013")
+```
+
+### Aufgabe 2
+The data shown in the list are the times in milliseconds it took one of
+us to move the mouse over a small target in a series of 20 trials. The
+times are sorted from shortest to longest.
+568, 577, 577, 581, 640, 641, 645, 657, 673, 696, 703, 720, 728, 728, 728,
+729, 777, 808, 824, 825, 865, 975, 1007, 1007
+
+```{r}
+cumfreqs <- tibble(times.mills= c(568, 577, 577, 581, 640, 641, 645, 657, 673, 696, 703, 720, 728, 728, 728, 729, 777, 808, 824, 825, 865, 975, 1007, 1007))
+cumfreqs <- cumfreqs %>% count(times.mills) %>% 
+mutate (
+    abs.freq = n ,
+    rel.freq = abs.freq / sum(abs.freq),
+    cum.rel.freq = cumsum (rel.freq)
+) %>% select(-n)
+```
+```{r echo=F}
+    cumfreqs
+```
+
+- Compute and draw the cumulative frequency distribution.
+
+```{r}
+H <- ecdf(cumfreqs$times.mills)
+```
+```{r eval=F}
+plot.ecdf(cumfreqs$times.mills ,
+                    xlab = "time" , ylab = "H(x)" ,
+                    main = "ungrouped Data")
+```
+```{r}
+plot(H)
+```
+
+
+    
+- Compute using the cumulative frequency distribution the proportion of response times
+- less equal 800
+```{r}
+H(800)
+```
+        
+- greater than 725
+```{r}
+1-H(725)
+```
+        
+- greater than 642 and less equal 777
+```{r}
+H(777) - H(642)
+```
+        
+- equal 696
+```{r}
+H(800) - H(696) + sum(cumfreqs$times.mills == 696) / length(cumfreqs$times.mills)
+```
+        
+
