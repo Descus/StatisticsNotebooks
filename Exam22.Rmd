@@ -85,3 +85,21 @@ a)
     coins <- tibble(no = 1:5, prob.head = dbinom(no, 5, 0.4), prob.tail = dbinom(no, 5, 1/6), prob.total = 1/3 * prob.head + 2/3 * prob.tail)
 ```
 
+b)
+Expected Value
+```{r}
+    ex <- sum(coins$no * coins$prob.total)
+    ex
+```
+Variance
+```{r}
+    ex2 <- sum(coins$no^2 * coins$prob.total)
+    ex2 - ex^2
+```
+c)
+
+$P(head|X=3) = \frac{P(head \cap X=3)}{P(X=3)} = P(X=3|head) * \frac{P(head)}{P(X=3)}$
+```{r}
+    dbinom(3, 5, 0.4) * (1/3) / coins[3, "prob.total"]
+```
+
