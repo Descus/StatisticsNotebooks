@@ -103,3 +103,30 @@ $P(head|X=3) = \frac{P(head \cap X=3)}{P(X=3)} = P(X=3|head) * \frac{P(head)}{P(
     dbinom(3, 5, 0.4) * (1/3) / coins[3, "prob.total"]
 ```
 
+## Aufgabe 3
+a) 
+```{r}
+    #N(mu = 0.53 * 300 * 50, sigma2 = 300*0.53^2*2^2)
+```
+
+## Aufgabe 4
+```{r}
+    df.votes <- c(1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0)
+```
+
+a)
+```{r}
+    X <- sum(df.votes)
+    n <- length(df.votes)
+    p_hat <- X / n
+    p_hat
+```
+```{r}
+    alpha <- 0.05
+    
+    test <- t.test(df.votes, alternative = "two.sided", conf.level = 1-alpha)
+    test$conf.int
+```
+
+
+

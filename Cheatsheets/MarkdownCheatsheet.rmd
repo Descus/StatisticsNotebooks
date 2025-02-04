@@ -1,0 +1,60 @@
+---
+title: "R Markdown Cheatsheet"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r include=F}
+    knitr::opts_chunk$set(eval=FALSE)
+```
+
+# R Markdown
+
+## Header
+```{md}
+---
+title: ""
+author: ""
+date: ""
+output:
+  html_document:
+    df_print: paged
+---
+```
+
+## Keybinds
+***Strg + Alt + I*** insert R Codeblock \
+***Alt + -*** insert left Arrow \
+***Strg + Shift + M*** insert Pipe \
+***Strg + Enter*** Run Current Line \
+***Strg + Alt + R*** Run Everything 
+
+## Default Settings
+```{md}
+'''{r include=F}
+    knitr::opts_chunk$set(echo=T, error=T)
+'''
+```
+
+<span style="color: red">!! IMPORTANT !!</span> `error = T` lets KnitR ignore errors and therefore is able to build regardless. Additionally missing dependencies do not crash the build.
+
+## Settings per block
+```{md}
+'''{r, label="", include=T, echo=T, eval= T, results="markup", fig.cap=""}
+'''
+```
+
+- label - name, for debugging
+- include - hides code and output in file
+- echo - hides code in file
+- eval - determines if code is ran
+- results - determines the output style
+    - markup - standard
+    - asis - plain text
+    - hidden - not shown
+- fig.cap - caption for figure in this block
+
+## Settings
+
+**Tools** &#8594; **Global Options...** &#8594; **Code** &#8594; **Display** to activate ***Rainbow Parenthesis***

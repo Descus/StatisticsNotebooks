@@ -1,5 +1,5 @@
 ---
-title: "Cheatsheet"
+title: "R  Cheatsheet"
 output:
   html_document:
     df_print: paged
@@ -8,26 +8,6 @@ output:
 ```{r include=F}
     knitr::opts_chunk$set(eval=FALSE)
 ```
-
-
-# R Markdown
-
-*Strg + Alt + I* um R Codeblock einzufügen
-
-```{md}
-'''{r, label="", include=T, echo=T, eval= T, results="markup", fig.cap=""}
-'''
-```
-
-- label - name, for debugging
-- include - hides code and output in file
-- echo - hides code in file
-- eval - determines if code is ran
-- results - determines the output style
-    - markup - standard
-    - asis - plain text
-    - hidden - not shown
-- fig.cap - caption for figure in this block
 
 # Descriptive
 
@@ -116,6 +96,12 @@ output:
     select(col1, col2)
 ```
 
+## Viewing specific Columns
+```{r}
+    slice()
+```
+
+
 ## Sorting
 ```{r}
     arrange(col1)
@@ -197,3 +183,24 @@ $y = a + b * x$
     cor(x, y) ^ 2
 ```
 
+
+
+# Inferential Statistics
+## Hypotheses Test
+
+$H_0: P \leq 80\%$ gegen hypothese
+
+$H_1: P > 80\%$ hypothese
+
+$n=200, \overline{x} = 172, \alpha = 0.05$
+
+```{r}
+    alpha <- 0.05 #significance level
+    qnorm(1-alpha) # bound 1-tailed
+    qnorm(1-alpha/2) #upper bound 2-tailed
+    qnorm(alpha/2) #lower bound 2-tailed
+```
+
+$\frac{r_n - p_0}{\sqrt{\frac{p_0 * (1-p_0)}{n}}}$
+
+$\frac{}{}$

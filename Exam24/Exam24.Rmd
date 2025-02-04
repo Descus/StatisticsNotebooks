@@ -1,0 +1,203 @@
+---
+title: "Exam24"
+author: "Niklas Schmiedel 1462485"
+date: "2025-02-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+```
+
+## Aufgabe 1
+
+### a)  
+
+| Column       | Type         | Scale   |
+|--------------|--------------|---------|
+| Year         | qualitative  | nominal |
+| Country_Name | quantitative | ratio   |
+
+### b)  
+
+```{r}
+    europe.data <- read.csv2("europe.data.csv")
+```
+
+### c)  
+
+```{r}
+    europe.data %>% 
+        mutate(year = str_remove(year, "year_") %>% as.integer(year), 
+               United.Kingdom = as.integer(United.Kingdom)) %>% 
+        pivot_longer(Albania:United.Kingdom, names_to = "country", values_to = "population") -> tidy
+    tidy
+```
+
+### d)  
+
+```{r}
+    tidy %>% 
+        filter(year == 2020) %>% 
+        top_n(5, population) %>% 
+        select(country) %>% 
+        as_vector() -> top5
+    top5
+
+    tidy %>% 
+        filter(country %in% top5 & year %in% c(2000,2020)) %>% 
+        group_by(country) %>% 
+        mutate(growth = population[2] - population[1]) %>%
+        filter(year == 2020) %>% 
+        select(-year) %>% 
+        arrange(-growth)
+```
+
+### e)  
+
+```{r}
+    tidy %>% 
+        filter(country == "Germany") %>% 
+        select(!country) -> g.pop
+    
+    g.pop %>% 
+        plot()
+    lm(population ~ year, data=g.pop) -> linear_model
+    abline(linear_model)
+```
+
+### f)  
+
+```{r}
+    linear_model$coefficients
+```
+
+### g)  
+
+```{r}
+    cor(g.pop$year, g.pop$population) ^ 2
+```
+
+### h)  
+
+```{r}
+    a <- linear_model$coefficients[1] 
+    b <- linear_model$coefficients[2] 
+    a + b * 2021
+```
+
+## Aufgabe 2
+
+### a)  
+
+```{r}
+    p.a <- 0.3
+    p.b <- 0.25
+    p.c <- 0.3
+    p.d <- 0.15
+    n <- 100
+```
+
+#### i)
+
+```{r}
+    pbinom(35, n, p.a) - pbinom(25, n, p.a)
+```
+
+#### ii)
+
+```{r}
+    dmultinom(c(35, 30, 20, 15), prob = c(p.a, p.b, p.c, p.d))
+```
+
+#### iii)
+
+```{r}
+    (1-(p.c+p.d))^4*(p.c+p.d)
+```
+
+
+### b)
+```{r}
+
+```
+
+## Aufgabe 3
+```{r}
+    penalties <- tibble(prob = c(0.6, 0.2, 0.15, 0.05), 
+                       fine=c(0, 20, 50, 100))
+    n <- 500
+```
+### a)
+```{r}
+    E.penalty <- (penalties$fine * penalties$prob) %>% sum()
+    E.penalty.2 <- (penalties$fine^2 * penalties$prob) %>% sum()
+    Var.penalty <- E.penalty.2 - E.penalty^2
+    E.penalty; Var.penalty
+```
+### b)
+```{r}
+    pnorm(9000, mean = n*E.penalty, sd = sqrt(n*Var.penalty)) -
+      pnorm(8000, mean = n*E.penalty, sd = sqrt(n*Var.penalty))
+```
+
+### c)
+```{r}
+    qnorm(0.9, mean = n*E.penalty, sd = sqrt(n*Var.penalty))
+```
+
+## Aufgabe 4
+
+### a)
+```{r}
+    read.csv2("runs.csv") -> runs
+    runs
+```
+### b)
+```{r}
+    runs %>% filter(gender == "F") %>% select(time) %>% as_vector() -> time.female
+    t.test(time.female, alternative = "two.sided", conf.level = 1-0.05)$conf.int
+```
+
+### c)
+Some stuff i dont understand
+
+### d)
+```{r}
+    sd.time <- sd(time.female)
+    mean.time <- mean(time.female)
+    nobs <- length(time.female)
+    conf.level <- 2 * pt(2*nobs^0.5/sd.time, df = nobs-1)-1
+    conf.level
+```
+### e)
+```{r}
+    p <- t.test(time.female, alternative = "greater", mu=101.98)$p.value
+    p
+    p <= 0.05
+```
+Reject $H_0$
+
+## Aufgabe 4
+### a)
+```{r}
+    mpg <- read.csv2("mpg.csv")
+```
+
+### b)
+Cars with manual Transmission are more efficient per gallon.
+
+### c)
+
+```{r}
+    var.test(mpg$hwy ~ mpg$trans, alternative= "two.sided", conf.level=0.90)
+```
+### d)
+```{r}
+    t.test(mpg$hwy ~ mpg$trans, alternative= "less", conf.level=0.99)
+```
+
+
+
