@@ -58,3 +58,10 @@ output:
 ## Settings
 
 **Tools** &#8594; **Global Options...** &#8594; **Code** &#8594; **Display** to activate ***Rainbow Parenthesis***
+
+## Force Newline
+
+```{md}
+    <div style="page-break-after: always;"></div>
+```
+
