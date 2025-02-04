@@ -6,3 +6,4 @@
 *.pdf
 *.[Tt]ex
 *.docx
+!Cheatsheets/*.pdf
