@@ -67,6 +67,7 @@ output:
 
 ## Export
 <span style="color: red">!! IMPORTANT !!</span> DO NOT KNIT TO PDF!, because a LaTeX installation is required.
+
 - Knit to HTML 
 - Click "Open in Browser" in the top right corner
 - Then Print the Page to PDF
