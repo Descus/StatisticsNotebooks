@@ -37,7 +37,8 @@ output:
 '''
 ```
 
-<span style="color: red">!! IMPORTANT !!</span> `error = T` lets KnitR ignore errors and therefore is able to build regardless. Additionally missing dependencies do not crash the build.
+<span style="color: red">!! IMPORTANT !!</span> `error = T` lets KnitR ignore errors and therefore is able to build regardless. Additionally missing dependencies do not crash the build. 
+DO NOT load libraries in the same block as setting the knitr::opts_chunk!
 
 ## Settings per block
 ```{md}
