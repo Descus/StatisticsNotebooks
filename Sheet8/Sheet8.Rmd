@@ -1,0 +1,38 @@
+---
+title: "Sheet8"
+output: html_document
+---
+
+```{r, include=F}
+    knitr::opts_chunk$set(echo=T, error=T)
+```
+
+```{r, include=F}
+    library(tidyverse)
+```
+
+
+## 1)
+
+### a)
+
+The tire lifetime is supposedly more than 50.000km
+
+### b)
+
+$H_0: TireLifetime \leq 50.000km$
+
+$H_1: TireLifetime > 50.000km$
+
+### c)
+
+Type-I error: Assume that the tire lifetime is less than 50.000km even it is more.
+
+Type-II error: Assume that the tire lifetime is more than 50.000km even though it's not.
+
+### d)
+
+A significance level of 10% means:
+we have a 10% Chance of getting a Type-I error
+
+2)

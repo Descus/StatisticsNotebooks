@@ -1,0 +1,395 @@
+---
+title: "Additional"
+output: 
+    html_document:
+        theme:
+            version: 4
+---
+
+```{r, include=F}
+    knitr::opts_chunk$set(echo=T, error=T)
+```
+
+```{r, include=F}
+    library(tidyverse)
+    library(TeachingDemos)
+```
+
+# Descriptive
+
+## 1)
+
+Import “corona.csv”.
+
+```{r}
+corona <- read_csv("corona.csv", col_types = "cciiiiiiidi")
+```
+
+## 2)
+
+Specify the type and scale of all variables
+
+| Var               | Type         | Scale    |
+|-------------------|--------------|----------|
+| continent         | qualitative  | nominal  |
+| location          | qualitative  | nominal  |
+| year              | quantitative | interval |
+| month             | quantitative | interval |
+| day               | quantitative | interval |
+| total_cases       | quantitative | ratio    |
+| new_cases         | quantitative | ratio    |
+| total_deaths      | quantitative | ratio    |
+| new_deaths        | quantitative | ratio    |
+| reproduction_rate | quantitative | ratio    |
+| population        | quantitative | ratio    |
+
+## 3)
+
+New cases and new deaths: october, germany
+
+```{r}
+corona %>% filter(location == "Germany" & month == 10) %>% select(day, new_cases, new_deaths)
+```
+
+## 4)
+
+Number of new cases and new deaths in every country per month
+
+```{r}
+corona %>% group_by(location, month) %>% summarise(newcases = sum(new_cases), newdeaths = sum(new_cases), .groups = "drop")
+```
+
+## 5)
+
+Max, min, mean and median of new cases and new deaths per month
+
+```{r}
+corona %>% group_by(month) %>% 
+    filter(!is.na(new_cases) | !is.na(new_deaths)) %>% 
+    summarise(
+        max_cases = max(new_cases), 
+        max_death = max(new_deaths), 
+        min_cases = min(new_cases), 
+        min_deaths = min(new_deaths), 
+        mean_cases = mean(new_cases), 
+        mean_deaths = mean(new_deaths), 
+        median_cases = median(new_cases),
+        median_deaths = median(new_deaths),
+        .groups = "drop"
+    )
+```
+
+## 6)
+
+7 Day incidences in germany 2020
+
+```{r}
+
+```
+
+## 7)
+
+Linear regression new deaths = a + b \* new cases in Germany
+
+```{r}
+cor <- corona %>% filter(location == "Germany") 
+
+lin_model <- lm(cor$new_deaths ~ cor$new_cases)
+```
+
+### a)
+
+Parameter a, b
+
+```{r}
+a <- lin_model$coefficients[1]
+b <- lin_model$coefficients[2]
+
+a; b
+```
+
+### b)
+
+Scatterplot
+
+```{r}
+plot(cor$new_deaths ~ cor$new_cases)
+abline(lin_model, col="red")
+```
+
+### c)
+
+Coefficient of correlation, coefficient of determination
+
+```{r}
+cor(lin_model$model)
+
+cor(lin_model$model) ** 2
+```
+
+### d)
+
+Prediction for 20000 new cases
+
+```{r}
+a + b * 20000
+```
+
+### e)
+
+Correlation: New Deaths correlate proportional to new cases.
+
+Determination: Half of the deaths are explained by the cases.
+
+### f)
+
+```{r}
+read.csv("corona_march_2020.csv") %>% 
+    pivot_longer(X1:X31, 
+                 names_to = "day", 
+                 values_to = "temp", 
+                 names_prefix = "X") %>% 
+    separate("temp", 
+             into=c("new_cases", "new_deaths"), 
+             sep="/")
+```
+
+# Probability
+
+## 1)
+
+100 Students in the graduating classes can choose between friday, saturday and sunday for their graduating ceremony. If all students choose one day and the preferences of the days are friday: 0.4, saturday: 0.5, sunday: 0.1 what is the probability that
+
+```{r}
+n <- 100
+days <- tibble(day = c("friday", "saturday", "sunday"), prob = c(0.4, 0.5, 0.1))
+```
+
+### a)
+
+more than 40 students sign up for saturday
+
+```{r}
+1 - pbinom(40, n, days$prob[2])
+```
+
+### b)
+
+30 students sign up for friday, 50 students sign up for saturday, 20 students sign up for sunday
+
+```{r}
+dmultinom(c(30, 50, 20), prob= days$prob)
+```
+
+### c)
+
+hat the 20th student is first student choosing sunday
+
+```{r}
+dgeom(19, days$prob[3])
+```
+
+### d)
+
+The room for the ceremony has 80 places. What is maximum number graduating students if the probability that the room is big enough is 0.9?
+
+```{r}
+tibble(
+        n=1:2000,
+        prob=pbinom(80, size = n, prob = 0.5)
+    ) %>% 
+    filter(prob <= 0.9) %>% 
+    head(1)
+```
+
+## 2)
+
+A snack bar offers sausage (3 Euro), hamburger (4 Euro), chips (2 Euro), sandwich (2.5). The owner of the snack bar assumes that a customer orders only one dish and the probabilities of the dishes are sausage: 0.2, hamburger: 0.4, chips: 0.25, sandwich: 0.15.
+
+```{r}
+snack <- tibble(food = c("sausage", "hamburger", "chips", "sandwich"), 
+                price = c(3, 4, 2, 2.5), 
+                prob = c(0.2, 0.4, 0.25, 0.15))
+```
+
+### a)
+
+What is the probability that the turnover of 100 customers is at least 300 Euro?
+
+```{r}
+n <- 100
+exp <- sum(snack$price * snack$prob)
+exp2 <- sum(snack$price**2 * snack$prob)
+
+var <- exp2 - exp**2
+
+mean100 <- n * exp
+sd100 <- sqrt(var * n)
+
+1-pnorm(300, mean = mean100, sd = sd100)
+```
+
+### b)
+
+What is the maximum amount of the turnover of 100 customers, which will be achieved with a probability of 0.95?
+
+```{r}
+qnorm(0.95, mean=mean100, sd = sd100)
+```
+
+# Inferential
+
+## 1)
+
+Consider the sample 0.92,0.83,0.81,0.70,0.88,0.73,1.05,0.91,0.83,0.67,0.94,0.90,0.91, 0.83,0.84,0.96,0.87,0.91,0.98,0.84,0.88,0.76,0.99,0.89,0.82 These are values of independent normally distributed random variables with sigma = 0.2.
+
+```{r}
+sample <- c(0.92,0.83,0.81,0.70,0.88,0.73,1.05,0.91,0.83,0.67,0.94,0.90,0.91,
+0.83,0.84,0.96,0.87,0.91,0.98,0.84,0.88,0.76,0.99,0.89,0.82)
+
+sd <- 0.2
+sample.sd <- sd(sample)
+sample.mean <- mean(sample)
+n <- length(sample)
+```
+
+### a)
+
+Determine a confidence interval of the expected value at the 99% level.
+
+```{r}
+alpha <- 0.01
+
+test <- z.test(x = sample, stdev = sd, alternative = "two.sided", conf.level = 1-alpha)
+test$conf.int
+```
+
+### b)
+
+Find the length of the confidence interval.
+
+```{r}
+test$conf.int[2] - test$conf.int[1]
+```
+
+### c)
+
+The length of the confidence interval should be 0.15. Find
+
+```{r}
+length <- 0.15
+```
+
+#### i)
+
+how many sample values are necessary.
+
+```{r}
+ceiling(((2*qnorm(1-alpha/2)*sd) / length)**2)
+```
+
+#### ii)
+
+an appropriate confidence level
+
+```{r}
+2*(1-pnorm((length * sqrt(n))/(2*sd)))
+```
+
+### d)
+
+$H_0: \mu(sample) \leq 0.9$
+
+$H_1: \mu(sample) > 0.9$
+
+```{r}
+mu0 <- 0.9
+alpha <- 0.05
+
+L <- qt(1-alpha, n-1)
+t <- (sample.mean - mu0) / ((sample.sd) / sqrt(n))
+
+t > L
+```
+
+We fail to Reject $H_0$. Therefore the mean is $\leq 0.9$
+
+## 2)
+
+A company produces chocolade bars with a standard weight of 100 gr. As a measure of quality controls he weighs 15 bars and obtains the following results:
+
+```{r}
+sample <- c(98.32,97.26,99.85,99.52,95.73,95.56,100.49,98.19,95.16,98.26,
+96.46,100.23,99.76,98.58,97.43)
+```
+
+### a)
+
+What is an appropriate hypothesis regarding the expected weight for a two-sided-test?
+
+$H_0: mu = 100$
+
+$H_1: mu \neq 100$
+
+### b)
+
+If weights can be assumed to be nomally distributed, which test should used to test these hypothesis?
+
+t-test
+
+### c)
+
+Conduct the test that was suggested to be used in b) at a 5% level. What s your test decision. Specify the p-value.
+
+```{r}
+alpha <- 0.05
+
+t.test(x = sample, mu = 100, alternative = "two.sided", conf.level = 1-alpha)$p.value
+```
+
+### d)
+
+Based on the sample, the producer changes the settings in production. To check whether the correction has led to an improvement, he again takes 15 chocolate bars and weighs them.
+
+```{r}
+sample2 <- c(100.14,100.05,96.51,98.70,98.22,101.06,103.55,100.16,100.60, 102.85,103.15,100.66,102.52,102.09,100.84)
+```
+
+What is an appropriate hypothesis for comparing the expected weights of the two samples?
+
+$H_0: \mu(x) \geq \mu(y)$
+
+$H_1: \mu(x) < \mu(y)$
+
+### e)
+
+Before testing the hypothesis using a test, first verify that the variances of the populations of the two samples are equal using an appropriate test at the 10% level.
+
+$H_0: \sigma(x) = \sigma(y)$
+
+$H_1: \sigma(x) \neq \sigma(y)$
+
+```{r}
+alpha <- 0.1
+
+test <- var.test(x = sample, y = sample2, alternative = "two.sided", conf.level = 1-alpha)
+test$statistic < test$conf.int[1] | test$statistic > test$conf.int[2]
+test$p.value < alpha
+```
+
+As both are false, we don't reject $H_0$, therefore the variances are equal.
+
+### f)
+
+Provide an appropriate test to test the hypothesis and perform at the 5% level. What is your test decision. Specify the p-value.
+
+```{r}
+alpha <- 0.05
+
+test <- t.test(x = sample, y = sample2, alternative = "less", paired = F, var.equal = T, conf.level = 1-alpha)
+test$statistic < test$conf.int[2]
+test$p.value
+test$p.value < alpha
+```
+
+As both are true, we reject $H_0$

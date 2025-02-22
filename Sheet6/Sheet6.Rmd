@@ -1,0 +1,119 @@
+---
+title: "Sheet6"
+output: html_document
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo=T, error=T)
+```
+
+```{r, include=F}
+library(tidyverse)
+```
+
+
+## 1)
+```{r}
+expand.grid(x1 = 1:6, x2 = 1:6) %>% rowwise() %>% mutate(y = x1 + x2, U = min(x1,x2), V = max(x1, x2)) -> dice
+dice
+```
+
+
+### a)
+$$\frac{1}{36}$$
+
+```{r}
+sj <- dice %>% group_by(x1,x2) %>% 
+    count() %>% 
+    ungroup() %>% 
+    mutate(probability = n/sum(n)) %>% 
+    select(!n)
+```
+
+
+### b)
+$$
+f(Y) = 
+\begin{cases}
+\frac{1}{36} & \text{if } Y\in\{2,12\} \\
+\frac{1}{18} & \text{if } Y\in\{3,11\} \\
+\frac{1}{12} & \text{if } Y\in\{4,10\} \\
+\frac{1}{9} & \text{if } Y\in\{5,9\} \\
+\frac{5}{36} & \text{if } Y\in\{6,8\} \\
+\frac{1}{6} & \text{if } Y = 7 \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+### c)
+$$
+f(U) = 
+\begin{cases}
+\frac{11}{36} & \text{if } U = 1 \\
+\frac{1}{4} & \text{if } U = 2 \\
+\frac{7}{36} & \text{if } U = 3 \\
+\frac{5}{36} & \text{if } U = 4 \\
+\frac{1}{12} & \text{if } U = 5 \\
+\frac{1}{36} & \text{if } U = 6 \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+### d) 
+$$
+f(V) = 
+\begin{cases}
+\frac{1}{36} & \text{if } V = 1 \\
+\frac{1}{12} & \text{if } V = 2 \\
+\frac{5}{36} & \text{if } V = 3 \\
+\frac{7}{36} & \text{if } V = 4 \\
+\frac{1}{4} & \text{if } V = 5 \\
+\frac{11}{36} & \text{if } V = 6 \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+### e)
+$$
+f(U, V) = 
+\begin{cases}
+\frac{1}{36} & \text{if } U = V \\
+\frac{1}{18} & \text{if } U < V \\
+0 & \text{otherwise}
+\end{cases}
+$$
+
+## 2)
+### a)
+
+```{r}
+k <- 1:20
+dbinom(x = k, size = 20, prob = 0.30) -> prob.dist
+prob.dist
+```
+
+### b)
+```{r}
+barplot(prob.dist, xlab = "Number of successes", names.arg=k)
+```
+
+### c)
+```{r}
+rbinom(20, 20, 0.3)
+```
+
+### d)
+```{r}
+sum(dbinom(6:14, 20, 0.3))
+```
+
+### e)
+```{r}
+qbinom(c(0.25, 0.5, 0.75), 20, 0.3)
+```
+
+```{r}
+qhyper(c(0.25, 0.5, 0.75), m=30, n =70, k =20)
+```
+
+

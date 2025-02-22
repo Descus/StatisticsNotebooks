@@ -1,0 +1,185 @@
+---
+title: "Sheet9"
+output: html_document
+---
+
+```{r, include=F}
+    knitr::opts_chunk$set(echo=T, error=T)
+```
+
+```{r, include=F}
+    library(tidyverse)
+```
+
+
+
+## 1)
+```{r}
+    p.eval <- \(p.val, alpha){if(p.val >= alpha) " fail to" else ""}
+
+    m.1 <- c(5.46, 5.34, 4.34, 4.82, 4.4, 5.12, 5.69, 5.53, 4.77, 5.82)
+    m.2 <- c(5.45, 5.31, 4.11, 4.69, 4.18, 5.05, 5.72, 5.54, 4.62, 5.89, 5.6, 5.19, 3.31, 4.43, 5.3, 4.09)
+    sig.1 <- 0.5
+    sig.2 <- 0.6
+    alpha <- 0.05
+    r <- qnorm(alpha)
+    
+    t <- (mean(m.1) - mean(m.2)) / sqrt((sig.1 ^ 2 / length(m.1)) + (sig.2 ^ 2 / length(m.2)))
+    
+    p.value <- pnorm(t)
+    
+    
+    t <= r
+```
+
+
+We`r p.eval(p.value, alpha)` reject $H_0$
+
+## 2)
+```{r}
+    g.1 <- c(7.06, 11.84, 9.28, 7.92, 13.5, 3.98, 3.82, 7.34, 8.7, 9.24, 4.86, 3.32, 12.78, 12, 5.24, 11.4, 6.56, 9.04, 7.72, 9.26, 7.88, 8.6, 9.3, 8.42, 8.54)
+    g.2 <- c(8.68, 6, 6.3, 10.24, 10.88, 5.36, 7.82, 4.7, 9.02, 9.78, 6.9, 5.8, 13.56, 10.32, 13.3, 11.38, 7.94, 10.74, 13.68, 14.92, 7.42, 10.36, 10.54, 5.22, 13.74, 12.98, 10.34, 10.02, 17.8, 13.04, 5.2, 9.4, 11.18, 12.68, 12.36)
+    m <- 25
+    n <- 35
+    alpha <- 0.05
+```
+
+$H_0: \sigma(g.1) = \sigma(g.2)$
+
+$H_1: \sigma(g.1) \neq \sigma(g.2)$
+
+```{r}
+var.test(g.1, g.2, alternative="two.sided", conf.level=1-alpha)$p.value < alpha
+```
+We fail to reject $H_0$
+
+
+$H_0: g.1 \geq g.2$
+
+$H_1: g.1 < g.2$
+
+```{r}
+t.test(g.1, g.2, alternative = "less", var.equal = T,conf.level = 1-alpha)$p.value < alpha
+```
+We reject $H_0$. Therefore method B is better
+
+## 3)
+
+```{r}
+n <- 10
+alpha <- 0.05
+g.w <- c(16, 15, 11, 20, 19, 14, 13, 15, 14, 16)
+g.a <- c(13, 13, 10, 18, 17, 11, 10, 15, 11, 16)
+
+test.result <- t.test(g.w, g.a, alternative="two.sided", paired = T, var.equal = T, conf.level=1-alpha)
+```
+
+$H_0: \mu (g.w) = \mu (g.a)$
+
+$H_1: \mu (g.w) \neq \mu (g.a)$
+```{r}
+test.result$p.value < alpha
+```
+We reject $H_0$. Therefore alcohol worsens the motor ability.
+
+$t: `r test.result$statistic`$
+
+$p: `r test.result$p.value`$
+
+## 4)
+```{r}
+g.a <- c(102.4, 101.3, 97.6, 98.2, 102.3, 99.1, 97.8, 103.9, 101.6, 100.1)
+g.b <- c(98.4, 101.7, 100.5, 99.3, 100.6, 99.6, 102.2, 101.1, 99.9, 101.0)
+n <- length(g.a)
+alpha <- 0.05
+```
+
+$H_0: \sigma(a) \leq \sigma(b)$
+
+$H_1: \sigma(a) > \sigma(b)$
+
+```{r}
+test.result <- var.test(g.a, g.b, alternative="greater", conf.level = 1-alpha)$p.value < alpha
+```
+We reject $H_0$. Therefore scale B is statistically better.
+
+## 5)
+
+```{r}
+g.1 <- c(7.2, 4.1, 5.5, 4.5, 5.7, 3.8, 4.6, 6.0, 5.2, 5.4)
+g.2 <- c(5.3, 4.4, 5.0, 3.5, 3.9, 4.9, 5.6, 2.5, 4.0, 3.6)
+alpha <- 0.1
+```
+
+### a.
+$H_0: \sigma(a) = \sigma(b)$
+
+$H_1: \sigma(a) \neq \sigma(b)$
+
+```{r}
+var.test(g.1, g.2, alternative="two.sided", conf.level = 1-alpha)$p.value < alpha
+```
+We fail to reject $H_0$. Therefore the dispersion is the same.
+
+### b.
+
+```{r}
+alpha <- 0.025
+```
+
+$H_0: \mu(a) \leq \mu(b)$
+
+$H_1: \mu(a) > \mu(b)$
+
+```{r}
+t.test(g.1, g.2, alternative="greater", var.equal = T, conv.level=1-alpha)$p.value < alpha
+```
+We reject $H_0$. Therefore the weight gain from composition A is greater than weight gain from composition B
+
+
+## 14)
+
+### a.
+```{r}
+data <- read_delim("magnets_pain.csv", delim = ";", col_types = "iiii")
+```
+
+### b.
+```{r}
+boxplot(data$Score_2 ~ data$Active)
+```
+
+
+```{r}
+data %>% group_by(Active) %>% 
+        summarise(mean = mean(Score_2),
+                  min = min(Score_2),
+                  max = max(Score_2),
+                  sd = sd(Score_2),
+                  q1 = quantile(Score_2, probs=0.25),
+                  q2 = quantile(Score_2, probs=0.5),
+                  q3 = quantile(Score_2, probs=0.75),
+                  iqr = q3 - q1) -> summ
+summ
+```
+### c.
+
+$H_0: \sigma(G.1) = \sigma(G.2)$
+
+$H_1: \sigma(G.1) < \sigma(G.2) \cap \sigma(G.1) > \sigma(G.2)$
+```{r}
+alpha <- 0.05
+var.test(data$Score_2 ~ data$Active, alternative="two.sided", conv.level= 1-alpha)$p.value < alpha
+```
+
+We Reject $H_0$, therefore the $\sigma$ are not equal
+
+
+$H_0: G.1 = G.2$
+
+$H_1: G.1 < G.2 \cap G.1 > G.2$
+```{r}
+t.test(data$Score_2 ~ data$Active, alternative="two.sided", var.equal=F, conv.level = 1-alpha)
+```
+
+

@@ -1,0 +1,156 @@
+---
+title: "Sheet7"
+output: html_document
+---
+
+```{r, include=F}
+knitr::opts_chunk$set(echo=T, error=T)
+```
+
+```{r, include=F}
+library(tidyverse)
+```
+
+
+# Confidence Intervals
+## 2.
+```{r}
+sample <- c(8, 9, 10, 13, 14, 16, 17, 20, 21)
+sd <- 2.8
+sample.mean <- mean(sample)
+```
+
+### a)
+```{r}
+alpha <- 0.05
+
+
+q <- qnorm(1 - (alpha / 2))
+n <- length(sample)
+
+L <- sample.mean - q * (sd / sqrt(n))
+U <- sample.mean + q * (sd / sqrt(n))
+
+L; U
+```
+
+### b)
+```{r}
+alpha <- 0.01
+
+
+q <- qnorm(1 - (alpha / 2))
+n <- length(sample)
+
+L <- sample.mean - q * (sd / sqrt(n))
+U <- sample.mean + q * (sd / sqrt(n))
+
+L; U
+```
+
+## 3.
+```{r}
+n <- 22
+mu <- 60
+```
+### a)
+```{r}
+sd <- 10
+alpha <- 0.01
+
+q <- qnorm(1 - (alpha / 2))
+
+L <- sample.mean - q * (sd / sqrt(n))
+U <- sample.mean + q * (sd / sqrt(n))
+
+L; U
+```
+
+### b)
+```{r}
+sd <- 10
+alpha <- 0.01
+t <- qt(1 - (alpha / 2), n - 1)
+
+L <- sample.mean - t * (sd / sqrt(n))
+U <- sample.mean + t * (sd / sqrt(n))
+
+L; U
+```
+
+## 4.
+```{r}
+alpha <- 0.05
+sample <- c(247.4, 249.0, 248.5, 247.5, 250.6, 252.2, 253.4, 248.3, 251.4, 246.9, 249.8, 250.6, 252.7, 250.6, 250.6, 252.5, 249.4, 250.6, 247.0, 249.4)
+```
+### a)
+```{r}
+sd <- 2
+sample.mean <- mean(sample)
+
+q <- qnorm(1 - (alpha / 2))
+
+L <- sample.mean - q * (sd / sqrt(n))
+U <- sample.mean + q * (sd / sqrt(n))
+
+L; U
+```
+
+### b)
+```{r}
+sd <- sd(sample)
+t <- qt(1 - (alpha / 2), n - 1)
+
+L <- sample.mean - t * (sd / sqrt(n))
+U <- sample.mean + t * (sd / sqrt(n))
+
+L; U
+```
+
+### c)
+```{r}
+mean <- 250
+
+qn <- sum((sample - mean) ** 2)
+
+L <- qn / (qchisq(1-(alpha/2), n))
+U <- qn / (qchisq((alpha/2), n))
+
+L; U
+```
+### d)
+```{r}
+sd <- sd(sample)
+b <- (n-1) * sd ** 2
+
+L <- b / (qchisq(1-(alpha/2), n-1))
+U <- b / (qchisq((alpha/2), n-1))
+
+L; U
+```
+
+## 5.
+
+```{r}
+n <- 51
+sample.mean <- 300
+sample.sd <- 60
+```
+
+### a)
+```{r}
+alpha <- 0.05
+
+U <- sample.mean + qt(1-alpha, n-1) * (sample.sd / sqrt(n))
+U
+```
+### b)
+
+??
+```{r}
+alpha <- 0.05
+qn <- sample.sd ** 2
+
+L <- qn / (qchisq(1 - (alpha / 2),n))
+L
+```

@@ -1,32 +1,59 @@
 ---
 title: "Exam24"
-author: "Niklas Schmiedel 1462485"
-date: "2025-02-01"
-output: html_document
+output: 
+    html_document:
+        theme:
+            version: 4
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, error=T)
+```
+
+```{r, include=FALSE}
 library(tidyverse)
 library(ggplot2)
 ```
 
 ## Aufgabe 1
 
-### a)  
+The file europe.data.csv is a subset from World Bank, population
+19602020, containing only european countries. The data set has 61 rows
+and 47 columns.
+
+-   year: years from 1960 to 2020
+-   Albania: population of Albania in year
+-   Andorra: population of Andorra in year
+-   ...
+-   United Kingdom: population of United Kingdom in year
+
+### a)
+
+Specify type (qualitativ, quantitave) and scale (nominal, ordinal,
+interval, ratio) of all variables.
 
 | Column       | Type         | Scale   |
 |--------------|--------------|---------|
 | Year         | qualitative  | nominal |
 | Country_Name | quantitative | ratio   |
 
-### b)  
+### b)
+
+Import europe.data.csv into a tibble.
 
 ```{r}
-    europe.data <- read.csv2("europe.data.csv")
+    europe.data <- read.csv("europe.data.csv", sep = ";", dec=",")
 ```
 
-### c)  
+### c)
+
+The data set is messy. Why? Make the data tidy and change the values of
+year and the population value to integer.
+
+The Columns with Country Names represent more of a Observation
 
 ```{r}
     europe.data %>% 
@@ -36,7 +63,11 @@ library(ggplot2)
     tidy
 ```
 
-### d)  
+### d)
+
+Create a table containing the size of the population and the gain from
+2000 to 2020 of the top 5 countries with biggest population in 2020. The
+table should be sorted according the population gain.
 
 ```{r}
     tidy %>% 
@@ -44,7 +75,6 @@ library(ggplot2)
         top_n(5, population) %>% 
         select(country) %>% 
         as_vector() -> top5
-    top5
 
     tidy %>% 
         filter(country %in% top5 & year %in% c(2000,2020)) %>% 
@@ -55,7 +85,11 @@ library(ggplot2)
         arrange(-growth)
 ```
 
-### e)  
+### e
+
+Consider only the german population and draw a scatterplot with the
+years as x values and the population values as y-values and add the
+regression line.
 
 ```{r}
     tidy %>% 
@@ -65,22 +99,30 @@ library(ggplot2)
     g.pop %>% 
         plot()
     lm(population ~ year, data=g.pop) -> linear_model
-    abline(linear_model)
+    abline(linear_model, col="red")
 ```
 
-### f)  
+### f)
+
+Determine the coefficients of the linear regression
+$population = a + b * year$ and interpret the values.
 
 ```{r}
     linear_model$coefficients
 ```
 
-### g)  
+### g)
+
+Determine the coefficient of determination and interpret the value.
 
 ```{r}
     cor(g.pop$year, g.pop$population) ^ 2
 ```
 
-### h)  
+### h)
+
+Make a prediction of the population in 2021 based on the linear
+regression.
 
 ```{r}
     a <- linear_model$coefficients[1] 
@@ -90,7 +132,10 @@ library(ggplot2)
 
 ## Aufgabe 2
 
-### a)  
+At a university, 30% of all students belong to faculty A, 25% of all
+students belong to faculty B, 30% of all students belong to faculty C
+and 15% of all students belong to faculty D. 100 students from the
+university are selected at random.
 
 ```{r}
     p.a <- 0.3
@@ -100,13 +145,22 @@ library(ggplot2)
     n <- 100
 ```
 
+### a)
+
+What is the probability that:
+
 #### i)
 
+between 25 and 35 of the selected students belong to faculty A.
+
 ```{r}
-    pbinom(35, n, p.a) - pbinom(25, n, p.a)
+    pbinom(35, n, p.a) - pbinom(24, n, p.a)
 ```
 
 #### ii)
+
+35 students of the selected students belong to faculty A, 30 students to
+faculty B, 20 students to Faculty C and 15 students to Faculty D.
 
 ```{r}
     dmultinom(c(35, 30, 20, 15), prob = c(p.a, p.b, p.c, p.d))
@@ -114,57 +168,114 @@ library(ggplot2)
 
 #### iii)
 
+if the students are selected randomly one after the other, the 5th
+student is the first student from faculty C or D.
+
 ```{r}
     (1-(p.c+p.d))^4*(p.c+p.d)
 ```
 
-
 ### b)
-```{r}
 
+The randomly selected students from faculties B and C are all to be
+tested together in a room with 80. What is the maximum sample size such
+that the room is sufficient with a probability of 0.5?
+
+```{r}
+n <- 1:2000
+tibble(
+    n = n,
+    v =  pbinom(80, n, prob = 0.5)
+) %>% filter(v < 0.9) %>% head(1)
 ```
 
 ## Aufgabe 3
+
+At a speed check, 60% of all vehicles comply with the speed limit of 50
+km/h. 20% of all vehicles have a speed between 50 km/h and 60 km/h, 15%
+of all vehicles have a speed between 60 km/h and 70 km/h and 5% have a
+speed above 70 km/h. A penalty of 20 euros is imposed for exceeding the
+speed limit by a maximum of 10 km/h. The amount of the penalty is 50
+euros if the speed limit is exceeded by between 10 km/h and 20 km/h and
+100 euros if the speed limit is exceeded by more than 20 km/h.
+
 ```{r}
     penalties <- tibble(prob = c(0.6, 0.2, 0.15, 0.05), 
                        fine=c(0, 20, 50, 100))
     n <- 500
 ```
+
 ### a)
+
+f 500 vehicles are measured, what is the approximate distribution of the
+penalties imposed?
+
 ```{r}
     E.penalty <- (penalties$fine * penalties$prob) %>% sum()
     E.penalty.2 <- (penalties$fine^2 * penalties$prob) %>% sum()
     Var.penalty <- E.penalty.2 - E.penalty^2
     E.penalty; Var.penalty
 ```
+
 ### b)
+
+What is the approximate probability that, for 500 vehicles measured, the
+amount of the penalties imposed will be between 8000 and 9000 Euro.
+
 ```{r}
     pnorm(9000, mean = n*E.penalty, sd = sqrt(n*Var.penalty)) -
       pnorm(8000, mean = n*E.penalty, sd = sqrt(n*Var.penalty))
 ```
 
 ### c)
+
+What is the minimum amount of the penalty imposed for 500 vehicles
+measured with a probability of 0.9?
+
 ```{r}
     qnorm(0.9, mean = n*E.penalty, sd = sqrt(n*Var.penalty))
 ```
 
+Assume that the speeds of the vehicles are independent, identically
+distributed random variables.
+
 ## Aufgabe 4
 
+The file runs.csv contains the results of a run with 186 participants.
+In file the times, the age, the gender and the names of all participants
+are given.
+
 ### a)
+
+Import runs.csv into a tibble.
+
 ```{r}
     read.csv2("runs.csv") -> runs
-    runs
 ```
+
 ### b)
+
+Assume that the variable time is approximately normally distributed.
+Evaluate a 95% confidence interval for the unknown expected value of the
+times of the females.
+
 ```{r}
     runs %>% filter(gender == "F") %>% select(time) %>% as_vector() -> time.female
     t.test(time.female, alternative = "two.sided", conf.level = 1-0.05)$conf.int
 ```
 
 ### c)
-Some stuff i dont understand
+
+Give an interpretation of the confidence interval.
+
+We are 95% confident that the population parameter is between 103.2382
+and 109.5149.
 
 ### d)
+
+Change the confidence level so that the length of the confidence
+interval is 4.
+
 ```{r}
     sd.time <- sd(time.female)
     mean.time <- mean(time.female)
@@ -172,32 +283,57 @@ Some stuff i dont understand
     conf.level <- 2 * pt(2*nobs^0.5/sd.time, df = nobs-1)-1
     conf.level
 ```
+
 ### e)
+
+One year ago the mean of the time of females was 101.98. Conduct an
+appropriate statistical test on a 5 percent level to check whether the
+expected value is bigger than last year. Specify the null hypothesis.
+What is the p-value? What is your decision?
+
 ```{r}
     p <- t.test(time.female, alternative = "greater", mu=101.98)$p.value
     p
     p <= 0.05
 ```
+
 Reject $H_0$
 
-## Aufgabe 4
+## Aufgabe 5
+
 ### a)
+
+Import the file mpg.csv into a tibble.
+
 ```{r}
     mpg <- read.csv2("mpg.csv")
 ```
 
 ### b)
+
+Interpret the side-by-side boxplot.
+
 Cars with manual Transmission are more efficient per gallon.
 
 ### c)
 
+Assume that the random variable highway miles per gallon (hwy) is
+normally distributed. Use an appopriate statistical test to check
+whether the variance can be assumed to be equal or not on a 10% level.
+Specify the null hypothesis. What is the p-value? What is your decision?
+
 ```{r}
     var.test(mpg$hwy ~ mpg$trans, alternative= "two.sided", conf.level=0.90)
 ```
+
 ### d)
+
+You want to check the conjecture that cars with automatic transmission
+will have a higher consumption. Specify an appropriate statistical test
+to check the conjecture by the given date and conduct the test on a 1%
+level. Specify the null hypothesis. What is the p-value? What is your
+decision?
+
 ```{r}
     t.test(mpg$hwy ~ mpg$trans, alternative= "less", conf.level=0.99)
 ```
-
-
-

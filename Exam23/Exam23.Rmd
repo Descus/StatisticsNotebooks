@@ -1,0 +1,162 @@
+---
+title: "Exam23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error=T)
+```
+
+
+```{r include=FALSE}
+library(tidyverse)
+library(ggplot2)
+```
+
+# Descriptive
+## 1.
+### a.
+```{r}
+data <- read_csv("exam_data_22.csv", col_types="iccDcicii")
+```
+
+### d.
+```{r}
+data <- data %>% mutate(grade = case_when(score < 60 ~ 5,
+                                  score >= 60 & score < 80 ~ 4,
+                                  score >= 80 & score < 100 ~ 3,
+                                  score >= 100 & score < 115  ~ 2,
+                                  score <= 115 ~ 1))
+data %>% head()
+```
+
+### e.
+```{r}
+data %>% 
+    group_by(gender, course) %>% 
+    summarise(n = n()) %>% 
+    arrange(course)
+```
+
+### f.
+```{r}
+data %>% group_by(subject, attempt) %>% summarize(n = n(), pass = sum(grade < 5), fail = n-pass, pass.rate = pass/n, fail.rate=fail/n, .groups = "drop") %>% arrange(subject, attempt) %>% head()
+```
+
+### g.
+```{r}
+boxplot(data$score ~ data$attempt)
+```
+
+People that took the exam more than once performed better on average. 
+And the grades are more condensed.
+
+### h.
+```{r}
+chitest <- chisq.test(data$gender, data$course)
+```
+
+Contengency
+
+```{r}
+chitest$observed
+```
+
+Indifference
+
+```{r}
+chitest$expected
+```
+
+$\chi$ Value
+
+```{r}
+chitest$statistic
+```
+
+## 2.
+### a.
+```{r}
+town <- tibble(
+    children = c(0, 1, 2, 3, 4),
+    children.prop = c(0.1, 0.2, 0.4, 0.2, 0.1))
+
+
+expected <- sum(town$children * town$children.prop)
+expected.var <- sum(town$children**2 * town$children.prop)
+var <- expected.var - expected**2
+
+dbinom(q=town$children.prop, size = 5, prob = 0.5)
+
+```
+
+x ~ N($\mu$ = `r expected`, $\sigma^2$ = `r var`)
+
+## 3.
+
+```{r}
+game <- tibble(rolls=1:6, win=case_when(rolls < 4 ~ -1,
+                                        rolls == 4 ~ 0,
+                                        rolls == 5 ~ 1,
+                                        rolls == 6 ~ 2), prob = 1/6)
+game
+```
+
+### a.
+```{r}
+expected <- sum(game$win * game$prob)
+expected.var <- sum(game$win**2 * game$prob)
+var <- expected.var - expected**2
+```
+
+### b.
+
+X ~ N($\mu$ = `r expected*100`, $\sigma^2$ = `r var * 100`)
+
+### c.
+```{r}
+1-pnorm(9, 100*expected, sqrt(var*100))
+```
+### d.
+```{r}
+qnorm(c(0.05, 0.95), 100*expected, sqrt(var*100))
+```
+
+
+
+## 4.
+### a.
+```{r}
+L <- 0.264192201
+U <- 0.415807799
+alpha <- 0.05
+
+p.hat <- (L+U)/2
+length <- U-L
+n <- ceiling((qnorm(1-alpha/2)/length)**2)
+
+p.hat; n
+```
+
+### b.
+```{r}
+binom.test(ceiling(p.hat * n), n, alternative="two.sided", conf.level = 1-alpha)$conf.int
+```
+
+```{r}
+length <- 0.075
+n <- ceiling((qnorm(1-alpha/2)/length)**2)
+n
+```
+
+## 5.
+```{r}
+before <- c(34, 32, 31, 23, 22, 17, 29, 20, 25, 27, 20, 17, 25, 27, 26)
+after <- c(46, 25, 34, 25, 40, 37, 31, 40, 27, 16, 32, 18, 28, 23, 39)
+```
+### a.
+```{r}
+
+```
+
+

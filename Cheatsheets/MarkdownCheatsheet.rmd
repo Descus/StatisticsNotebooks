@@ -3,10 +3,12 @@ title: "R Markdown Cheatsheet"
 output:
   html_document:
     df_print: paged
+    theme:
+        version: 4
 ---
 
 ```{r include=F}
-    knitr::opts_chunk$set(eval=FALSE)
+    knitr::opts_chunk$set(eval=F, error = T, warning = F)
 ```
 
 # R Markdown
@@ -20,6 +22,8 @@ date: ""
 output:
   html_document:
     df_print: paged
+    theme:
+        version: 4
 ---
 ```
 
@@ -33,7 +37,8 @@ output:
 ## Default Settings
 ```{md}
 '''{r include=F}
-    knitr::opts_chunk$set(echo=T, error=T)
+    knitr::opts_chunk$set(echo=T, error=T, warning=F)
+    options(scipen=999) #Disable Scientific notation in Inline code
 '''
 ```
 
@@ -60,7 +65,7 @@ DO NOT load libraries in the same block as setting the knitr::opts_chunk!
 
 **Tools** &#8594; **Global Options...** &#8594; **Code** &#8594; **Display** to activate ***Rainbow Parenthesis***
 
-## Force Newline
+## Force Pagebreak
 
 ```{md}
     <div style="page-break-after: always;"></div>
@@ -71,4 +76,5 @@ DO NOT load libraries in the same block as setting the knitr::opts_chunk!
 
 - Knit to HTML 
 - Click "Open in Browser" in the top right corner
-- Then Print the Page to PDF
+- Then Print the Page to PDF (***Strg + P***)
+

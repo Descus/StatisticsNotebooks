@@ -1,0 +1,362 @@
+---
+title: "WS23 Probe"
+author: 'Matrikelnr.: 1481589, Name: Mert Kaan Demirel'
+date: "2025-02-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, error = T)
+```
+
+```{r}
+library(tidyverse)
+library(TeachingDemos)
+```
+
+# Descriptive
+
+# 1.
+
+```{r}
+data <- read.csv("corona.csv", sep = ",") %>% 
+    as_tibble()
+data
+```
+
+# 2.
+
+continent: qualitative, nominal
+
+location: qualitative, nominal
+
+year: quantitative, interval
+
+month: quantitative, interval
+
+day: quantitative, interval
+
+total_cases: quantitative, ratio
+
+new_cases: quantitative, ratio
+
+total_deaths: quantitative, ratio
+
+new_deaths: quantitative, ratio
+
+reproduction_rate: quantitative, ratio
+
+population: quantitative, ratio
+
+# 3.
+
+```{r}
+octger <- data %>% 
+    filter(month == 10 & location == "Germany") %>% 
+    select(day,new_deaths, new_cases)
+octger
+```
+
+# 4.
+
+```{r}
+new <- data %>% 
+    group_by(month, location) %>% 
+    summarise(
+        new_cases = sum(new_cases),
+        new_deaths = sum(new_deaths)
+    )
+    
+new
+```
+
+# 5.
+
+```{r}
+total <- data %>%
+    filter(!is.na(new_cases) | !is.na(new_deaths)) %>% 
+    group_by(month) %>% 
+    summarise(
+        minC = min(new_cases),
+        minD = min(new_deaths),
+        maxC = max(new_cases),
+        maxD = max(new_deaths),
+        meanC = mean(new_cases),
+        meanD = mean(new_deaths),
+        medianC = median(new_cases),
+        medianD = median(new_deaths)
+    )
+total
+```
+
+# 6.
+
+```{r}
+seven <- data %>% 
+    filter(location == "Germany" & year == 2020)    
+seven
+```
+WTF is the true solution.
+
+# 7.
+
+```{r}
+lm <- lm(seven$new_deaths ~ seven$new_cases)
+lm
+```
+
+a.
+
+```{r}
+a <- lm$coefficients[1]
+a
+```
+
+```{r}
+b <- lm$coefficients[2]
+b
+```
+
+b.
+
+```{r}
+plot(seven$new_cases, seven$new_deaths)
+abline(a = a, b = b)
+```
+
+c.
+
+```{r}
+cor(lm$model) # Correlation
+
+cor(lm$model)**2 # Determination
+```
+
+d.
+```{r}
+a + b * 20000
+```
+
+e.
+
+Correlation: New Deaths correlate proportional to new cases.
+
+Determination: Half of the deaths are explained by the cases.
+
+
+# 8.
+
+```{r}
+march <- read.csv("corona_march_2020.csv", sep = ",") %>% 
+    as_tibble()
+march
+```
+Cases and deaths are in the same column. Days are split into separate columns.
+```{r}
+march.tidy <- march %>% 
+    pivot_longer(cols = X1:X31, names_to = "day", names_prefix = "X", values_to = "temp", values_drop_na = T) %>% 
+    separate(temp, into = c("new_cases", "new_deaths"), sep = "/", convert = T) %>% 
+    mutate(
+        day = as.integer(day)
+    )
+march.tidy
+```
+
+# Probability
+
+# Ex. 1
+
+a.
+
+```{r}
+1 - pbinom(q = 40, size = 100, prob = 0.5)
+```
+
+b.
+
+```{r}
+dmultinom(x = c(30, 50, 20), prob = c(0.4, 0.5, 0.1))
+```
+
+c.
+
+```{r}
+dgeom(x = 19, 0.1)
+```
+
+d.
+
+```{r}
+try <- tibble(
+    n = 100:150,
+    prob = pnorm(80, mean = n * 0.5, sd = sqrt(0.25 * n))
+) %>% 
+    filter(prob <= 0.9) %>% 
+    head(1) %>% 
+    select(n)
+try
+```
+
+# Ex. 2
+
+a.
+
+```{r}
+p <- c(0.2, 0.4, 0.25, 0.15)
+n <- c(3, 4, 2, 2.5)
+
+EX <- sum(p * n)
+EX2 <- sum(p * n^2)
+
+VarX <- sum(p * n^2) - sum(p * n)^2
+
+mean100 <- 100 * EX
+sd100 <- sqrt(100 * VarX)
+
+1 - pnorm(300, mean = mean100, sd = sd100)
+```
+
+b.
+
+```{r}
+qnorm(0.95, mean = mean100, sd = sd100)
+```
+
+# Inferential
+
+# Ex. 1
+
+```{r}
+sample <- c(0.92,0.83,0.81,0.70,0.88,0.73,1.05,0.91,0.83,0.67,0.94,0.90,0.91,
+0.83,0.84,0.96,0.87,0.91,0.98,0.84,0.88,0.76,0.99,0.89,0.82)
+
+sd <- 0.2
+```
+
+a.
+
+```{r}
+alpha <- 0.01
+
+test <- z.test(x = sample, stdev = sd, alternative = "two.sided", conf.level = 1-alpha)
+test$conf.int
+```
+Confidence Interval: [0.7629668, 0.9690332]
+
+b.
+
+```{r}
+length <- 0.9690332 - 0.7629668
+length
+```
+
+c.
+
+```{r}
+length <- 0.15
+```
+
+i.
+
+```{r}
+q <- qnorm(1 - (alpha / 2))
+n <- ceiling(((2 * q * sd) / length)^2)
+n
+```
+
+ii.
+
+```{r}
+n <- length(sample)
+z_value <- (length * sqrt(n)) / (2 * sd)
+alpha <- 2 * (1 - pnorm(z_value))
+1-alpha
+```
+Confidence Level is 93.9%
+
+d.
+
+$H_0$: mu <= 0.9
+$H_1$: mu > 0.9
+
+```{r}
+alpha <- 0.05
+
+test <- t.test(x = sample, mu = 0.9, alternative = "greater", conf.level = 1-alpha)
+t <- test$statistic
+r <- test$conf.int[1]
+t
+t > r
+test$p.value < alpha
+```
+As both tests are false, we don't reject $H_0$
+
+# Ex. 2
+
+```{r}
+x <- c(98.32,97.26,99.85,99.52,95.73,95.56,100.49,98.19,95.16,98.26,
+96.46,100.23,99.76,98.58,97.43)
+```
+
+a.
+
+$H_0$: mu = 100
+
+$H_1$: mu != 100
+
+b.
+
+t-test
+
+c.
+
+```{r}
+alpha <- 0.05
+
+test <- t.test(x = x, mu = 100, alternative = "two.sided", conf.level = 1-alpha)
+test$statistic < test$conf.int[1] | test$statistic > test$conf.int[2]
+```
+
+```{r}
+test$p.value
+test$p.value < alpha
+```
+As both tests equal true, we reject $H_0$
+
+d.
+
+```{r}
+y <- c(100.14,100.05,96.51,98.70,98.22,101.06,103.55,100.16,100.60,
+102.85,103.15,100.66,102.52,102.09,100.84)
+```
+
+$H_0$: mu(x) >= mu(y)
+
+$H_1$: mu(x) < mu(y)
+
+e.
+
+$H_0$: sigma(x) = sigma(y)
+
+$H_1$: sigma(x) != sigma(y)
+
+```{r}
+alpha <- 0.1
+
+test <- var.test(x = x, y = y, alternative = "two.sided", conf.level = 1-alpha)
+test$statistic < test$conf.int[1] | test$statistic > test$conf.int[2]
+test$p.value < alpha
+```
+As both are false, we don't reject $H_0$, therefore the variances are equal.
+
+f.
+
+```{r}
+alpha <- 0.05
+
+test <- t.test(x = x, y = y, alternative = "less", paired = F, var.equal = T, conf.level = 1-alpha)
+test$statistic < test$conf.int[2]
+test$p.value
+test$p.value < alpha
+```
+As both are true, we reject $H_0$
